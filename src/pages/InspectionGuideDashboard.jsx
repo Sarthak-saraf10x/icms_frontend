@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import MainLayout from './MainLayout';
+import MainLayout from '../layouts/MainLayout';
 
 function InspectionGuideDashboard() {
   const [claims, setClaims] = useState([]);
@@ -83,10 +83,10 @@ function InspectionGuideDashboard() {
       });
       // Transform checklist data to ensure id, question, and type
       const formattedChecklist = (checklistResponse.data || []).map((item, index) =>
-  typeof item === 'string'
-    ? { id: item, question: item, type: 'text' }
-    : { id: item.question || `generated-${index + 1}`, question: item.question || '', type: item.type || 'text' }
-);
+        typeof item === 'string'
+          ? { id: item, question: item, type: 'text' }
+          : { id: item.question || `generated-${index + 1}`, question: item.question || '', type: item.type || 'text' }
+      );
       setChecklist(formattedChecklist);
       setChecklistResponses({});
       setComments('');
@@ -183,7 +183,7 @@ function InspectionGuideDashboard() {
           <div className="border-b border-slate-200 pb-4 mb-6">
             <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Assigned Claims</h2>
           </div>
-          
+
           {claims.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
               <p className="text-slate-500 font-medium">No claims assigned.</p>
@@ -195,15 +195,14 @@ function InspectionGuideDashboard() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-lg font-bold text-slate-900">Claim #{claim.claim.claim_id}</h3>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-                        claim.claim.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        claim.claim.status === 'declined' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${claim.claim.status === 'approved' ? 'bg-green-100 text-green-800' :
+                          claim.claim.status === 'declined' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                        }`}>
                         {claim.claim.status.replace('_', ' ')}
                       </span>
                     </div>
-                    
+
                     <p className="text-sm text-slate-600 mb-4">
                       <span className="font-medium text-slate-900">Policy ID:</span> {claim.claim.policy_id}
                     </p>
@@ -216,7 +215,7 @@ function InspectionGuideDashboard() {
                             <p className="text-slate-700"><strong>Date:</strong> {appointment.appointment_date}</p>
                             <p className="text-slate-700 capitalize"><strong>Status:</strong> {appointment.status}</p>
                             {appointment.status === 'scheduled' && (
-                              <button 
+                              <button
                                 onClick={() => handleSelectClaim(claim)}
                                 className="mt-3 w-full inline-flex justify-center items-center rounded bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition"
                               >
@@ -241,7 +240,7 @@ function InspectionGuideDashboard() {
             <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
               <h2 className="text-lg font-bold text-slate-900">Inspection Report: Claim #{selectedClaim.claim.claim_id}</h2>
             </div>
-            
+
             <div className="p-6 md:p-8 space-y-8">
               {/* Checklist */}
               <div>
@@ -340,7 +339,7 @@ function InspectionGuideDashboard() {
                 >
                   Submit Final Report
                 </button>
-                <button 
+                <button
                   onClick={() => setSelectedClaim(null)}
                   className="inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >

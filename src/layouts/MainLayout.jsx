@@ -11,7 +11,7 @@ import {
   Bell
 } from 'lucide-react';
 
-const MainLayout = () => {
+const MainLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -150,8 +150,7 @@ const MainLayout = () => {
         {/* Page Content */}
         <main className="flex-1 px-4 sm:px-6 lg:px-10 py-8 lg:py-4">
           <div className="max-w-7xl mx-auto">
-            {/* The Outlet renders the matched child route component */}
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </main>
       </div>

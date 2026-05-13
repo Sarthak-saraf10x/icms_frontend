@@ -6,15 +6,15 @@ import LandingPage from '../pages/LandingPage';
 import LoginPage from '../pages/LoginPage';           // Renamed from Login.jsx
 import RegisterPage from '../pages/RegisterPage';     // Renamed from Register.jsx
 import CheckoutPage from '../pages/CheckoutPage';
-//import CustomerDashboard from '../pages/CustomerDashboard';
-//import PolicyManagerDashboard from '../pages/PolicyManagerDashboard';
-//import InspectionGuideDashboard from '../pages/InspectionGuideDashboard';
-//import ClaimOfficerDashboard from '../pages/ClaimOfficerDashboard';
 
-// 🧩 Components
-//import ClaimForm from '../components/claim/ClaimForm';
-//import PolicyForm from '../components/policy/PolicyForm';
-//import PolicyTypeForm from '../components/policy/PolicyTypeForm';
+import PolicyManagerDashboard from '../pages/PolicyManagerDashboard';
+import InspectionGuideDashboard from '../pages/InspectionGuideDashboard';
+import ClaimOfficerDashboard from '../pages/ClaimOfficerDashboard';
+
+
+import ClaimForm from '../components/claim/ClaimForm';
+import PolicyForm from '../components/policy/PolicyForm';
+import PolicyTypeForm from '../components/policy/PolicyTypeForm';
 
 const AppRoutes = () => {
     return (
@@ -26,14 +26,7 @@ const AppRoutes = () => {
             <Route path="/checkout" element={<CheckoutPage />} />
 
 
-            {/* <Route
-                path="/customerdashboard"
-                element={
-                    <PrivateRoute allowedRoles={['customer']}>
-                        <CustomerDashboard />
-                    </PrivateRoute>
-                }
-            />
+
             <Route
                 path="/claim/:policyId"
                 element={
@@ -41,10 +34,10 @@ const AppRoutes = () => {
                         <ClaimForm />
                     </PrivateRoute>
                 }
-            /> */}
+            />
 
 
-            {/* <Route
+            <Route
                 path="/policyManagerDashboard"
                 element={
                     <PrivateRoute allowedRoles={['policy_manager']}>
@@ -69,7 +62,7 @@ const AppRoutes = () => {
                 }
             />
 
-            
+
             <Route
                 path="/inspectionGuideDashboard"
                 element={
@@ -79,7 +72,7 @@ const AppRoutes = () => {
                 }
             />
 
-            
+
             <Route
                 path="/claimOfficerDashboard"
                 element={
@@ -87,7 +80,7 @@ const AppRoutes = () => {
                         <ClaimOfficerDashboard />
                     </PrivateRoute>
                 }
-            /> */}
+            />
         </Routes>
     );
 };

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Zenith Policies Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#c1c9bd",
+                    "primary-fixed-dim": "#bdcbb2",
+                    "tertiary-fixed": "#dde5d9",
+                    "on-primary": "#ffffff",
+                    "secondary": "#735854",
+                    "on-tertiary-fixed-variant": "#414940",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#30302e",
+                    "on-tertiary-fixed": "#161d16",
+                    "surface-container": "#f0edea",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#2f3c29",
+                    "on-primary-fixed-variant": "#3e4a37",
+                    "on-primary-fixed": "#131e0e",
+                    "on-surface-variant": "#444841",
+                    "on-background": "#1b1c1a",
+                    "outline-variant": "#c5c8be",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#98a68e",
+                    "surface-tint": "#55624d",
+                    "tertiary": "#596157",
+                    "secondary-container": "#ffdad5",
+                    "on-secondary-fixed-variant": "#59413d",
+                    "background": "#fbf9f5",
+                    "inverse-on-surface": "#f3f0ed",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#ffdad5",
+                    "surface-bright": "#fbf9f5",
+                    "on-tertiary-container": "#333a32",
+                    "surface-container-high": "#eae8e4",
+                    "surface-container-low": "#f6f3f0",
+                    "surface-variant": "#e4e2df",
+                    "error-container": "#ffdad6",
+                    "surface": "#fbf9f5",
+                    "primary-fixed": "#d9e7cd",
+                    "on-secondary-container": "#795e5a",
+                    "primary": "#55624d",
+                    "on-secondary-fixed": "#2a1614",
+                    "surface-container-highest": "#e4e2df",
+                    "surface-dim": "#dcdad6",
+                    "tertiary-container": "#9ca499",
+                    "on-surface": "#1b1c1a",
+                    "on-error-container": "#93000a",
+                    "outline": "#757870",
+                    "secondary-fixed-dim": "#e1bfba",
+                    "inverse-primary": "#bdcbb2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "64px",
+                    "stack-md": "16px",
+                    "unit": "8px",
+                    "gutter": "24px",
+                    "stack-lg": "32px",
+                    "stack-sm": "8px",
+                    "container-max": "1440px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "48px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "headline-lg": ["Manrope"],
+                    "label-sm": ["Manrope"],
+                    "headline-lg-mobile": ["Manrope"],
+                    "label-md": ["Manrope"],
+                    "headline-sm": ["Manrope"],
+                    "body-sm": ["Manrope"],
+                    "headline-md": ["Manrope"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-border { position: relative; }
+        .active-nav-border::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #55624d;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar Section -->
+<header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/30 docked full-width">
+<div class="flex justify-between items-center px-gutter py-unit w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-md">
+<button class="text-primary hover:bg-primary-container/20 transition-colors duration-200 p-2 rounded-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Policies</h1>
+</div>
+<div class="flex items-center gap-unit">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all shadow-sm">
+                    Create New Policy
+                </button>
+</div>
+</div>
+<!-- Search and Filter Bar -->
+<div class="px-gutter pb-stack-md pt-unit">
+<div class="flex gap-stack-sm items-center">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border border-outline-variant/50 rounded-lg text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Search policies..." type="text"/>
+</div>
+<button class="p-2.5 rounded-lg border border-outline-variant/50 text-on-surface-variant hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-gutter py-stack-lg">
+<!-- Dashboard Stats Bento Grid (Mobile Focus) -->
+<div class="grid grid-cols-2 gap-stack-md mb-stack-lg">
+<div class="bg-white p-stack-md rounded-xl border border-outline-variant/30 flex flex-col gap-unit">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Total Active</span>
+<span class="text-headline-md font-bold text-primary">24</span>
+</div>
+<div class="bg-white p-stack-md rounded-xl border border-outline-variant/30 flex flex-col gap-unit">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Pending Review</span>
+<span class="text-headline-md font-bold text-secondary">08</span>
+</div>
+</div>
+<!-- Policy List Container -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-unit">Central Directory</h2>
+<!-- Policy Item: Remote Work -->
+<div class="bg-white p-gutter rounded-xl border border-outline-variant/30 flex justify-between items-start hover:shadow-md transition-shadow group">
+<div class="flex flex-col gap-unit">
+<div class="flex items-center gap-stack-sm">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-[10px] uppercase">Active</span>
+<span class="text-label-sm text-on-surface-variant">Updated 2d ago</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Remote Work Policy</h3>
+<p class="text-body-sm text-on-surface-variant max-w-[240px]">Standard procedures for distributed team collaboration and equipment.</p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Policy Item: Health & Wellness -->
+<div class="bg-white p-gutter rounded-xl border border-outline-variant/30 flex justify-between items-start hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-unit">
+<div class="flex items-center gap-stack-sm">
+<span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-label-sm text-[10px] uppercase">Under Review</span>
+<span class="text-label-sm text-on-surface-variant">Updated 5d ago</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Health &amp; Wellness Benefit</h3>
+<p class="text-body-sm text-on-surface-variant max-w-[240px]">Comprehensive overview of mental health and physical fitness stipends.</p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Policy Item: Data Privacy -->
+<div class="bg-white p-gutter rounded-xl border border-outline-variant/30 flex justify-between items-start hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-unit">
+<div class="flex items-center gap-stack-sm">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-[10px] uppercase">Active</span>
+<span class="text-label-sm text-on-surface-variant">Updated 1w ago</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Data Privacy Protocol</h3>
+<p class="text-body-sm text-on-surface-variant max-w-[240px]">Compliance guidelines for handling sensitive employee and client data.</p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Policy Item: Social Media -->
+<div class="bg-white p-gutter rounded-xl border border-outline-variant/30 flex justify-between items-start hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-unit">
+<div class="flex items-center gap-stack-sm">
+<span class="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-[10px] uppercase">Draft</span>
+<span class="text-label-sm text-on-surface-variant">Created yesterday</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Social Media Ethics</h3>
+<p class="text-body-sm text-on-surface-variant max-w-[240px]">Professional conduct expectations across public social channels.</p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Ethereal Decorative Card -->
+<div class="mt-section-gap relative overflow-hidden rounded-2xl bg-primary/5 p-gutter border border-primary/10">
+<div class="relative z-10 flex flex-col gap-unit">
+<h4 class="font-headline-sm text-headline-sm text-primary font-bold">Policy Governance Tip</h4>
+<p class="text-body-sm text-on-surface-variant">Scheduled audits reduce compliance risks by 40%. Review your Remote Work guidelines every 6 months to stay aligned with evolving labor laws.</p>
+</div>
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Responsive Pivot) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-lg border-t border-outline-variant/20 md:hidden z-50">
+<div class="flex justify-around items-center h-16 max-w-lg mx-auto">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-[10px] font-semibold uppercase tracking-wider">Dashboard</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary active-nav-border transition-colors">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">policy</span>
+<span class="text-[10px] font-semibold uppercase tracking-wider">Policies</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">insights</span>
+<span class="text-[10px] font-semibold uppercase tracking-wider">Analytics</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-[10px] font-semibold uppercase tracking-wider">Settings</span>
+</button>
+</div>
+</nav>
+<!-- Desktop Navigation Side Drawer (Hidden on Mobile) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-72 flex-col p-stack-md bg-surface border-r border-outline-variant/30 shadow-sm">
+<div class="flex flex-col gap-stack-lg h-full">
+<div class="flex items-center gap-stack-md px-unit">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container/20 border border-primary/20">
+<img alt="Zenith Admin" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6u76pW__-HsIp6Kj2zAnhses6cdWCZB_StsxMLyYWnuBj895oYrJdcrhj9oG9MpWkdD7h6Vu6NZCC_EujGxW2kHpU2MetCzLiVZMOmFuabtiC894L2if1SLDxs3JxBIQEVDcENx87kl_Qw2OzX_I4LHiVy4z9lvh5Wng4KoSf9AfUCazYp6LIys5NePr2Qoz1xs6PjHC7Su0o_9Fu-tQOPub9jpzPkvsJd0sL7AUmeC8MaZuwW-9S3nDDgQe-bkja8NX5BrLtgg"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-black text-primary">Zenith Admin</h3>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Global Oversight</p>
+</div>
+</div>
+<nav class="flex flex-col gap-unit flex-1">
+<a class="flex items-center gap-stack-md px-gutter py-3 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-stack-md px-gutter py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">policy</span>
+<span class="font-label-md text-label-md">Policies</span>
+</a>
+<a class="flex items-center gap-stack-md px-gutter py-3 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">insights</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-stack-md px-gutter py-3 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="bg-surface-container-low rounded-xl p-stack-md mt-auto">
+<p class="text-label-sm text-on-surface-variant mb-unit">Admin Profile</p>
+<div class="flex items-center gap-stack-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-[12px]">WA</div>
+<span class="text-body-sm font-semibold">Administrator</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Padding for bottom nav on mobile -->
+<div class="h-20 md:hidden"></div>
+</body></html>

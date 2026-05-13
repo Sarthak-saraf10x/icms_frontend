@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
-import MainLayout from '../MainLayout';
+import MainLayout from '../layouts/MainLayout';
 
 function ClaimOfficerDashboard() {
   const [policies, setPolicies] = useState([]);
@@ -77,7 +77,7 @@ function ClaimOfficerDashboard() {
         setAnalytics({
           totalClaims,
           approvedClaims,
-          rejectedClaims, 
+          rejectedClaims,
           avgClaimAmount,
           avgProcessingTime
         });
@@ -182,7 +182,7 @@ function ClaimOfficerDashboard() {
   return (
     <MainLayout title="Claim Officer Dashboard" role="claims_officer" user={user} notifications={notifications}>
       <div className="space-y-6">
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
             <p className="text-sm text-red-700">{error}</p>
@@ -229,9 +229,9 @@ function ClaimOfficerDashboard() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <select 
+              <select
                 className="block w-full sm:w-48 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border bg-white"
-                value={filterStatus} 
+                value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option value="">All Statuses</option>
@@ -240,7 +240,7 @@ function ClaimOfficerDashboard() {
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
               </select>
-              <button 
+              <button
                 onClick={handleExportCSV}
                 className="inline-flex justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition"
               >
@@ -248,7 +248,7 @@ function ClaimOfficerDashboard() {
               </button>
             </div>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50">
@@ -272,15 +272,15 @@ function ClaimOfficerDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{c.customer_id}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                          ${c.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                            c.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                            'bg-yellow-100 text-yellow-800'}`}>
+                          ${c.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            c.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'}`}>
                           {c.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{c.appointment_status || 'N/A'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
+                        <button
                           onClick={() => handleSelectClaim(c)}
                           className="text-indigo-600 hover:text-indigo-900 font-semibold"
                         >
@@ -302,9 +302,9 @@ function ClaimOfficerDashboard() {
               <h2 className="text-xl font-semibold text-slate-900">Claim Review: {selectedClaim.claim_id}</h2>
               <button onClick={() => { setSelectedClaim(null); setClaimDetails(null); }} className="text-slate-400 hover:text-slate-600">Close</button>
             </div>
-            
+
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-              
+
               {/* Left Column */}
               <div className="space-y-6">
                 <div>
@@ -363,9 +363,9 @@ function ClaimOfficerDashboard() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                        <select 
-                          name="status" 
-                          value={approvalForm.status} 
+                        <select
+                          name="status"
+                          value={approvalForm.status}
                           onChange={handleApprovalChange}
                           className="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border bg-white"
                         >
@@ -373,7 +373,7 @@ function ClaimOfficerDashboard() {
                           <option value="rejected">Reject Claim</option>
                         </select>
                       </div>
-                      
+
                       {approvalForm.status === 'approved' && (
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">Approved Amount ($)</label>
@@ -387,7 +387,7 @@ function ClaimOfficerDashboard() {
                           />
                         </div>
                       )}
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Final Comments</label>
                         <textarea
@@ -398,15 +398,15 @@ function ClaimOfficerDashboard() {
                           className="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border bg-white"
                         />
                       </div>
-                      
+
                       <div className="flex gap-3 pt-2">
-                        <button 
+                        <button
                           onClick={handleApproveClaim}
                           className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition shadow-sm"
                         >
                           Submit Decision
                         </button>
-                        <button 
+                        <button
                           onClick={() => setSelectedClaim(null)}
                           className="flex-1 bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-md font-medium text-sm hover:bg-slate-50 transition shadow-sm"
                         >
