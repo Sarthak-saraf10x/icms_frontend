@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* 
+  Global resets for Enterprise SaaS 
+  (Tailwind handles most, but we can set up custom typography defaults here if needed)
+*/
+@layer base {
+  body {
+    @apply antialiased text-slate-900 bg-slate-50;
+  }
+}
