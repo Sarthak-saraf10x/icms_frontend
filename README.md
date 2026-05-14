@@ -1,26 +1,40 @@
 <div align="center">
-  <h1>✨ ICMS Frontend (Insurance Claim Management System)</h1>
+  <h1>VEHICO Frontend (Vehicle Insurance Management System)</h1>
   <p>
     <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
     <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
     <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   </p>
-  <p>The interactive and responsive user interface for the ICMS Platform.</p>
+  <p>The interactive and responsive user interface for the VEHICO Platform.</p>
 </div>
 
 ---
 
 > [!NOTE]
-> This is the React frontend application for ICMS. It features distinct role-based dashboards (Customers, Managers, Officers, Guides) and communicates with the Python Flask backend.
+> This is the React frontend application for VEHICO. It features distinct role-based dashboards (Customers, Managers, Officers, Guides) and communicates with the Python Flask backend to handle vehicle insurance operations seamlessly.
 
-## 🚀 Quick Start
+## Project Working
+
+<details>
+<summary><b>View Frontend Workflow</b></summary>
+<br/>
+
+The VEHICO frontend is designed to provide specific workflows based on the user's role in the vehicle insurance lifecycle:
+
+1. **Customers:** Customers can browse through various vehicle insurance policies, view their coverage details, and purchase them securely. If an accident occurs, customers can initiate a claim directly from their dashboard, filling out incident details and uploading photo evidence of the vehicle damage.
+2. **Inspection Guides:** Guides use their dashboard to receive scheduled vehicle inspections. They review the uploaded damage images, follow standardized checklists, and submit a formal inspection report back to the system.
+3. **Claim Officers:** Officers have an administrative view of all pending claims. They can review customer submissions alongside the guide's inspection reports. Based on this comprehensive view, they can approve or reject the vehicle claims.
+4. **Policy Managers:** Managers can create new types of vehicle insurance policies, set pricing, and manage the overall portfolio offered to customers.
+</details>
+
+## How to Start
 
 <details>
 <summary><b>Click to expand Setup Instructions</b></summary>
 <br/>
 
 ### 1. Prerequisites
-- Node.js (v16+)
+- Node.js (v16 or higher)
 - npm or yarn
 
 ### 2. Installation
@@ -37,23 +51,23 @@ npm run dev
 ```
 
 > [!TIP]
-> The app will typically run on `http://localhost:5173`. Any changes to the code will hot-reload automatically!
+> The app will start the development server on `http://localhost:5173`. Any changes to the code will hot-reload automatically in your browser.
 </details>
 
-## 🧩 Key Features
+## Key Features
 
 <details>
 <summary><b>View Frontend Capabilities</b></summary>
 <br/>
 
-- **Role-Based Access Control (RBAC)**: Custom routing and guarded components based on user role.
-- **Dynamic Dashboards**: Dedicated UI views for Customers, Policy Managers, Claim Officers, and Inspection Guides.
-- **Form Handling & Validation**: Interactive forms for purchasing policies and filing claims.
-- **File Uploads**: Drag-and-drop support for uploading damage evidence.
-- **Responsive Layout**: Designed to look great on desktop, tablet, and mobile devices.
+- **Role-Based Access Control (RBAC)**: Custom routing and guarded components based on the user's role (Customer, Officer, Guide, Manager).
+- **Dynamic Dashboards**: Dedicated UI views tailored for different vehicle insurance interactions.
+- **Form Handling & Validation**: Interactive forms for purchasing policies and filing claims with data validation.
+- **File Uploads**: Support for uploading vehicle damage evidence.
+- **Responsive Layout**: Modern design system customized with Tailwind CSS to look great on desktop, tablet, and mobile devices.
 </details>
 
-## 📂 Directory Structure
+## Directory Structure
 
 <details>
 <summary><b>View Frontend Architecture</b></summary>
@@ -74,7 +88,7 @@ icms_frontend/
 ```
 </details>
 
-## 📜 Available Scripts
+## Available Scripts
 
 > [!IMPORTANT]
 > Use these scripts to manage the lifecycle of your frontend application.
