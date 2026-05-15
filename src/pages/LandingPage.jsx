@@ -91,31 +91,12 @@ function LandingPage() {
     fetchData();
   }, []);
 
-  const handlePurchase = async (policyId) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:5000/api/policies/${policyId}/purchase`,
-        {},
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-      );
-      setError('');
-      alert('Policy purchased successfully');
-      const availableResponse = await axios.get('http://localhost:5000/api/policies/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setAvailablePolicies(availableResponse.data);
-      const purchasedResponse = await axios.get('http://localhost:5000/api/policies/customer', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setPurchasedPolicies(purchasedResponse.data);
-    } catch (err) {
-      console.error('Purchase error:', err);
-      if (err.response?.status === 401) {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-      }
-      setError(err.response?.data?.error || 'Failed to purchase policy');
+  const handlePurchase = (policyId) => {
+    const checkoutUrl = `/checkout?policy=${policyId}&step=2`;
+    if (!isLoggedIn) {
+      navigate(`/login?redirect=${encodeURIComponent(checkoutUrl)}`);
+    } else {
+      navigate(checkoutUrl);
     }
   };
 
