@@ -7,8 +7,10 @@ function CheckoutPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const vehicleNumber = searchParams.get('vehicle') || '';
+  const preSelectedPolicyId = searchParams.get('policy');
+  const initialStep = parseInt(searchParams.get('step')) || 1;
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(initialStep);
   const [availablePolicies, setAvailablePolicies] = useState([]);
   const [policyTypes, setPolicyTypes] = useState({});
   const [selectedPolicy, setSelectedPolicy] = useState(null);
@@ -20,7 +22,10 @@ function CheckoutPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate(`/login?redirect=${encodeURIComponent(`/checkout?vehicle=${vehicleNumber}`)}`);
+      let redirectUrl = `/checkout?vehicle=${vehicleNumber}`;
+      if (preSelectedPolicyId) redirectUrl += `&policy=${preSelectedPolicyId}`;
+      if (initialStep !== 1) redirectUrl += `&step=${initialStep}`;
+      navigate(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
       return;
     }
 
@@ -48,6 +53,13 @@ function CheckoutPage() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setAvailablePolicies(policiesRes.data);
+        
+        if (preSelectedPolicyId) {
+          const policyToSelect = policiesRes.data.find(p => p.policy_id === preSelectedPolicyId);
+          if (policyToSelect) {
+            setSelectedPolicy(policyToSelect);
+          }
+        }
       } catch (err) {
         console.error('Error fetching checkout data:', err);
         setError('Failed to load required data. Please try again.');
@@ -55,7 +67,7 @@ function CheckoutPage() {
     };
 
     fetchData();
-  }, [navigate, vehicleNumber]);
+  }, [navigate, vehicleNumber, preSelectedPolicyId, initialStep]);
 
   const handleNextStep = () => {
     if (step === 1 && !selectedPolicy) {
