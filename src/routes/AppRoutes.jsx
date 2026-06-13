@@ -9,7 +9,9 @@ import CheckoutPage from '../pages/CheckoutPage';
 
 import PolicyManagerDashboard from '../pages/PolicyManagerDashboard';
 import InspectionGuideDashboard from '../pages/InspectionGuideDashboard';
+import InspectionReportPage from '../pages/InspectionReportPage';
 import ClaimOfficerDashboard from '../pages/ClaimOfficerDashboard';
+import ClaimReviewPage from '../pages/ClaimReviewPage';
 
 
 import ClaimForm from '../components/claim/ClaimForm';
@@ -71,13 +73,28 @@ const AppRoutes = () => {
                     </PrivateRoute>
                 }
             />
-
+            <Route
+                path="/inspection/:claimId"
+                element={
+                    <PrivateRoute allowedRoles={['inspection_guide']}>
+                        <InspectionReportPage />
+                    </PrivateRoute>
+                }
+            />
 
             <Route
                 path="/claimOfficerDashboard"
                 element={
                     <PrivateRoute allowedRoles={['claims_officer']}>
                         <ClaimOfficerDashboard />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/review/:claimId"
+                element={
+                    <PrivateRoute allowedRoles={['claims_officer']}>
+                        <ClaimReviewPage />
                     </PrivateRoute>
                 }
             />

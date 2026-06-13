@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import MainLayout from '../layouts/MainLayout';
 
 function InspectionGuideDashboard() {
   const [claims, setClaims] = useState([]);
-  const [selectedClaim, setSelectedClaim] = useState(null);
-  const [checklist, setChecklist] = useState([]);
-  const [checklistResponses, setChecklistResponses] = useState({});
-  const [comments, setComments] = useState('');
-  const [image, setImage] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,43 +20,22 @@ function InspectionGuideDashboard() {
           return;
         }
 
-        // Verify user role
-        const userResponse = await axios.get('http://localhost:5000/api/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (userResponse.data.role !== 'inspection_guide') {
+        // Verify role from token (no API call needed)
+        const decoded = jwtDecode(token);
+        if (decoded.role !== 'inspection_guide') {
           setError('Only inspection guides can access this dashboard');
           navigate('/');
           return;
         }
 
-        // Fetch claims assigned to inspection guide
-        const claimsResponse = await axios.get('http://localhost:5000/api/claims/inspection_guide', {
+        // Single API call to get claims with appointments
+        const response = await axios.get(`http://localhost:5000/api/claims/get_assigned_claims/${decoded.user_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        // Fetch claim details
-        const claimDetailsPromises = claimsResponse.data.map((claim) =>
-          axios.get(`http://localhost:5000/api/claims/${claim.claim_id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          })
-        );
-        const claimDetailsResponses = await Promise.all(claimDetailsPromises);
-        const uniqueClaims = claimDetailsResponses
-          .map((res) => res.data)
-          .filter((claim, index, self) =>
-            index === self.findIndex((c) => c.claim.claim_id === claim.claim.claim_id)
-          );
-        setClaims(uniqueClaims);
+        setClaims(response.data);
       } catch (err) {
         console.error('Fetch error:', err);
         if (err.response?.status === 401) {
@@ -67,288 +43,168 @@ function InspectionGuideDashboard() {
           navigate('/login');
         }
         setError(err.response?.data?.error || 'Failed to fetch claims');
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, [navigate]);
 
-  const handleSelectClaim = async (claim) => {
-    try {
-      const token = localStorage.getItem('token');
-      const checklistResponse = await axios.get(`http://localhost:5000/api/policies/${claim.claim.policy_id}/checklist`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      // Transform checklist data to ensure id, question, and type
-      const formattedChecklist = (checklistResponse.data || []).map((item, index) =>
-        typeof item === 'string'
-          ? { id: item, question: item, type: 'text' }
-          : { id: item.question || `generated-${index + 1}`, question: item.question || '', type: item.type || 'text' }
-      );
-      setChecklist(formattedChecklist);
-      setChecklistResponses({});
-      setComments('');
-      setImage(null);
-      setSelectedClaim(claim);
-      console.log('Formatted Checklist:', formattedChecklist);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch checklist');
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'approved':
+        return 'bg-[#d9e7cd] text-[#131e0e]';
+      case 'declined':
+      case 'rejected':
+        return 'bg-[#fed7d2] text-[#755754]';
+      case 'inspected':
+        return 'bg-[#dce5f3] text-[#3a4a6b]';
+      case 'inspection_scheduled':
+        return 'bg-[#fff3cd] text-[#856404]';
+      default:
+        return 'bg-[#f2f4ed] text-[#55624d]';
     }
   };
 
-  const handleChecklistResponse = (itemId, value) => {
-    setChecklistResponses((prev) => {
-      const newResponses = { ...prev, [itemId]: value };
-      console.log('Checklist Responses:', newResponses);
-      return newResponses;
-    });
+  const hasScheduledAppointment = (claim) => {
+    return claim.appointments?.some(a => a.status === 'scheduled');
   };
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  const handleSubmitReport = async (appointmentId) => {
-    try {
-      if (!appointmentId) {
-        throw new Error('No appointment selected');
-      }
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-      formData.append('checklist_responses', JSON.stringify(checklistResponses));
-      formData.append('comments', comments);
-      if (image) {
-        formData.append('file', image);
-      }
-
-      await axios.post(`http://localhost:5000/api/claims/${appointmentId}/inspection/report`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      alert('Inspection report submitted successfully');
-      setSelectedClaim(null);
-      setChecklist([]);
-      setChecklistResponses({});
-      setComments('');
-      setImage(null);
-
-      // Refresh claims
-      const claimsResponse = await axios.get('http://localhost:5000/api/claims/inspection_guide', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      const claimDetailsPromises = claimsResponse.data.map((claim) =>
-        axios.get(`http://localhost:5000/api/claims/${claim.claim_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
-      );
-      const claimDetailsResponses = await Promise.all(claimDetailsPromises);
-      const uniqueClaims = claimDetailsResponses
-        .map((res) => res.data)
-        .filter((claim, index, self) =>
-          index === self.findIndex((c) => c.claim.claim_id === claim.claim.claim_id)
-        );
-      setClaims(uniqueClaims);
-    } catch (err) {
-      console.error('Submit error:', err);
-      setError(err.response?.data?.error || 'Failed to submit report');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+  // Stats
+  const totalClaims = claims.length;
+  const pendingInspections = claims.filter(c => hasScheduledAppointment(c)).length;
+  const completedInspections = claims.filter(c => c.claim.status === 'inspected' || c.claim.status === 'approved').length;
 
   return (
     <MainLayout title="Inspection Guide Dashboard" role="inspection_guide">
       <div className="space-y-8 pb-12">
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md shadow-sm">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="bg-[#fed7d2] border-l-4 border-[#ba1a1a] p-4 rounded-xl shadow-sm">
+            <p className="text-sm text-[#755754] font-medium" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{error}</p>
           </div>
         )}
 
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(85,98,77,0.06)] border border-[#ecefe8] p-6">
+            <p className="text-xs font-semibold text-[#757870] uppercase tracking-wider mb-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Total Assigned</p>
+            <p className="text-3xl font-bold text-[#191c18]" style={{ fontFamily: 'Manrope, sans-serif' }}>{totalClaims}</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(85,98,77,0.06)] border border-[#ecefe8] p-6">
+            <p className="text-xs font-semibold text-[#757870] uppercase tracking-wider mb-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Pending Inspection</p>
+            <p className="text-3xl font-bold text-[#856404]" style={{ fontFamily: 'Manrope, sans-serif' }}>{pendingInspections}</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(85,98,77,0.06)] border border-[#ecefe8] p-6">
+            <p className="text-xs font-semibold text-[#757870] uppercase tracking-wider mb-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Completed</p>
+            <p className="text-3xl font-bold text-[#55624d]" style={{ fontFamily: 'Manrope, sans-serif' }}>{completedInspections}</p>
+          </div>
+        </div>
+
+        {/* Claims Table */}
         <section>
-          <div className="border-b border-slate-200 pb-4 mb-6">
-            <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Assigned Claims</h2>
+          <div className="border-b border-[#ecefe8] pb-4 mb-6">
+            <h2 className="text-xl font-bold text-[#191c18] tracking-tight" style={{ fontFamily: 'Manrope, sans-serif' }}>
+              Assigned Claims
+            </h2>
           </div>
 
-          {claims.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
-              <p className="text-slate-500 font-medium">No claims assigned.</p>
+          {loading ? (
+            <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(85,98,77,0.06)] border border-[#ecefe8] p-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#55624d] mx-auto"></div>
+              <p className="text-[#757870] font-medium mt-3" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Loading claims...</p>
+            </div>
+          ) : claims.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(85,98,77,0.06)] border border-[#ecefe8] p-12 text-center">
+              <svg className="mx-auto h-12 w-12 text-[#c5c8be] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="text-[#757870] font-medium" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>No claims assigned.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {claims.map((claim) => (
-                <div key={claim.claim.claim_id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-lg font-bold text-slate-900">Claim #{claim.claim.claim_id}</h3>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${claim.claim.status === 'approved' ? 'bg-green-100 text-green-800' :
-                          claim.claim.status === 'declined' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800'
-                        }`}>
-                        {claim.claim.status.replace('_', ' ')}
-                      </span>
-                    </div>
+            <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(85,98,77,0.06)] border border-[#ecefe8] overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                  <thead>
+                    <tr className="bg-[#f2f4ed] border-b border-[#ecefe8]">
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Claim ID</th>
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Customer</th>
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Policy</th>
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Claim Date</th>
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Appointment</th>
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Status</th>
+                      <th className="text-left px-6 py-4 text-xs font-bold text-[#757870] uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#ecefe8]">
+                    {claims.map((item) => {
+                      const scheduledAppt = item.appointments?.find(a => a.status === 'scheduled');
+                      const latestAppt = item.appointments?.[item.appointments.length - 1];
+                      const displayAppt = scheduledAppt || latestAppt;
 
-                    <p className="text-sm text-slate-600 mb-4">
-                      <span className="font-medium text-slate-900">Policy ID:</span> {claim.claim.policy_id}
-                    </p>
-
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-100 space-y-3">
-                      <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Appointments</h4>
-                      {claim.appointments && claim.appointments.length > 0 ? (
-                        claim.appointments.map((appointment) => (
-                          <div key={appointment.appointment_id} className="text-sm">
-                            <p className="text-slate-700"><strong>Date:</strong> {appointment.appointment_date}</p>
-                            <p className="text-slate-700 capitalize"><strong>Status:</strong> {appointment.status}</p>
-                            {appointment.status === 'scheduled' && (
+                      return (
+                        <tr
+                          key={item.claim.claim_id}
+                          className="hover:bg-[#f8faf3] transition-colors cursor-pointer group"
+                          onClick={() => navigate(`/inspection/${item.claim.claim_id}`)}
+                        >
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-bold text-[#191c18]">#{item.claim.claim_id}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-medium text-[#191c18]">{item.claim.customer_name || 'N/A'}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-medium text-[#444841]">{item.claim.policy_name || 'N/A'}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm text-[#757870]">
+                              {item.claim.claim_date ? new Date(item.claim.claim_date).toLocaleDateString() : '—'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm text-[#757870]">
+                              {displayAppt?.appointment_date
+                                ? new Date(displayAppt.appointment_date).toLocaleDateString()
+                                : '—'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusStyle(item.claim.status)}`}>
+                              {item.claim.status.replace(/_/g, ' ')}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {scheduledAppt ? (
                               <button
-                                onClick={() => handleSelectClaim(claim)}
-                                className="mt-3 w-full inline-flex justify-center items-center rounded bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/inspection/${item.claim.claim_id}`);
+                                }}
+                                className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-br from-[#55624d] to-[#98a68e] text-white text-xs font-bold shadow-[0_4px_12px_rgba(85,98,77,0.3)] hover:shadow-[0_6px_16px_rgba(85,98,77,0.4)] transition-all"
                               >
                                 Start Inspection
                               </button>
+                            ) : (
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/inspection/${item.claim.claim_id}`);
+                                }}
+                                className="inline-flex items-center text-xs font-semibold text-[#55624d] hover:text-[#191c18] transition-colors"
+                              >
+                                View Details →
+                              </span>
                             )}
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-slate-500">No appointments scheduled.</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </section>
-
-        {selectedClaim && (
-          <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mt-8">
-            <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
-              <h2 className="text-lg font-bold text-slate-900">Inspection Report: Claim #{selectedClaim.claim.claim_id}</h2>
-            </div>
-
-            <div className="p-6 md:p-8 space-y-8">
-              {/* Checklist */}
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 mb-4">Inspection Checklist</h3>
-                {checklist.length === 0 ? (
-                  <p className="text-sm text-slate-500 italic">No checklist available for this policy.</p>
-                ) : (
-                  <div className="space-y-5">
-                    {checklist.map((item) => (
-                      <div key={item.id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                        <label className="block text-sm font-medium text-slate-900 mb-3">{item.question}</label>
-                        {item.type === 'boolean' ? (
-                          <div className="flex items-center space-x-6">
-                            <label className="inline-flex items-center cursor-pointer">
-                              <input
-                                type="radio"
-                                name={`checklist-${item.id}`}
-                                value="pass"
-                                checked={checklistResponses[item.id] === 'pass'}
-                                onChange={() => handleChecklistResponse(item.id, 'pass')}
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
-                              />
-                              <span className="ml-2 text-sm text-slate-700">Pass</span>
-                            </label>
-                            <label className="inline-flex items-center cursor-pointer">
-                              <input
-                                type="radio"
-                                name={`checklist-${item.id}`}
-                                value="fail"
-                                checked={checklistResponses[item.id] === 'fail'}
-                                onChange={() => handleChecklistResponse(item.id, 'fail')}
-                                className="h-4 w-4 text-red-600 focus:ring-red-500 border-slate-300"
-                              />
-                              <span className="ml-2 text-sm text-slate-700">Fail</span>
-                            </label>
-                          </div>
-                        ) : (
-                          <input
-                            type="text"
-                            value={checklistResponses[item.id] || ''}
-                            onChange={(e) => handleChecklistResponse(item.id, e.target.value)}
-                            placeholder={`Enter response`}
-                            className="block w-full rounded-md border-slate-300 py-2 pl-3 px-3 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm border"
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Comments form */}
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 mb-3">Overall Comments</h3>
-                <textarea
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                  placeholder="Enter detailed inspection findings..."
-                  rows="4"
-                  className="block w-full rounded-md border-slate-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm border"
-                />
-              </div>
-
-              {/* Image Upload */}
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 mb-3">Photographic Evidence</h3>
-                <div className="flex flex-col items-start gap-4">
-                  {image && (
-                    <div className="relative rounded-lg overflow-hidden border border-slate-200">
-                      <img src={URL.createObjectURL(image)} alt="Preview" className="h-48 w-48 object-cover" />
-                    </div>
-                  )}
-                  <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-slate-300 px-6 pt-5 pb-6 w-full sm:w-1/2 hover:border-indigo-400 transition">
-                    <div className="space-y-1 text-center">
-                      <svg className="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      <div className="flex text-sm text-slate-600 justify-center">
-                        <label className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
-                          <span>Upload a file</span>
-                          <input type="file" className="sr-only" accept="image/*" onChange={handleImageChange} />
-                        </label>
-                      </div>
-                      <p className="text-xs text-slate-500">PNG, JPG up to 10MB</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-4 pt-6 border-t border-slate-200">
-                <button
-                  onClick={() => handleSubmitReport(selectedClaim.appointments[0]?.appointment_id)}
-                  disabled={checklist.length > 0 && Object.keys(checklistResponses).length < checklist.length}
-                  className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Submit Final Report
-                </button>
-                <button
-                  onClick={() => setSelectedClaim(null)}
-                  className="inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
       </div>
     </MainLayout>
   );

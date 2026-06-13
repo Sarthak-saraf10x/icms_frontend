@@ -115,7 +115,7 @@ function ClaimForm() {
       setClaim(claimDetails.data);
       setInspectionDate('');
       setInspectionGuideId('');
-       alert('Inspection scheduled successfully');
+      alert('Inspection scheduled successfully');
       navigate('/customerdashboard');
       setError('');
     } catch (err) {
@@ -131,10 +131,10 @@ function ClaimForm() {
   return (
     <MainLayout title={`Claim for: ${policy.policy_name}`} role="customer">
       <div className="max-w-3xl mx-auto space-y-8 pb-12">
-        
+
         {/* Back navigation */}
-        <button 
-          onClick={() => navigate('/customerdashboard')}
+        <button
+          onClick={() => navigate('/')}
           className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1"
         >
           ← Back to Dashboard
@@ -151,14 +151,14 @@ function ClaimForm() {
             <h2 className="text-lg font-semibold text-slate-900">Claim Application</h2>
             {claim && (
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize
-                ${claim.claim.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                  claim.claim.status === 'declined' ? 'bg-red-100 text-red-800' : 
-                  'bg-yellow-100 text-yellow-800'}`}>
+                ${claim.claim.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  claim.claim.status === 'declined' ? 'bg-red-100 text-red-800' :
+                    'bg-yellow-100 text-yellow-800'}`}>
                 {claim.claim.status.replace('_', ' ')}
               </span>
             )}
           </div>
-          
+
           <div className="p-6">
             {!claim ? (
               <div className="text-center py-12">
@@ -170,7 +170,7 @@ function ClaimForm() {
                 <h3 className="mt-2 text-sm font-semibold text-slate-900">No Active Claim Found</h3>
                 <p className="mt-1 text-sm text-slate-500">You haven't filed a claim for this policy yet.</p>
                 <div className="mt-6">
-                  <button 
+                  <button
                     onClick={handleCreateClaim}
                     className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition"
                   >
@@ -180,7 +180,7 @@ function ClaimForm() {
               </div>
             ) : (
               <div className="space-y-8">
-                
+
                 {/* Documents Section */}
                 <div>
                   <div className="flex justify-between items-end mb-4">
@@ -289,7 +289,7 @@ function ClaimForm() {
                             ))}
                           </select>
                         </div>
-                        <button 
+                        <button
                           onClick={handleScheduleInspection}
                           className="w-full sm:w-auto inline-flex justify-center items-center rounded-md bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition"
                         >
@@ -326,7 +326,7 @@ function ClaimForm() {
                     </ul>
                   </div>
                 )}
-                
+
               </div>
             )}
           </div>
